@@ -10,7 +10,6 @@ import { useAuth } from '../context/AuthContext';
 const AssetsPage = () => {
   const { user, hasPermission } = useAuth();
   const [activeFilter, setActiveFilter] = useState('all');
-
   // Mock asset data
   const assets = [
     {
