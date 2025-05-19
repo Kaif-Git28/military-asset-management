@@ -16,5 +16,4 @@ async function testConnection() {
     process.exit(1);
   }
 }
-
 testConnection(); 
