@@ -136,4 +136,3 @@ exports.getProfile = async (req, res) => {
     res.status(500).json({ message: 'Error fetching profile', error: error.message });
   }
 }; 
-//
