@@ -20,3 +20,4 @@ const sequelize = new Sequelize(
 );
 
 module.exports = sequelize; 
+//save
