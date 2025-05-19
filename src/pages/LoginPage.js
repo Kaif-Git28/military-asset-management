@@ -11,7 +11,6 @@ const LoginSchema = Yup.object().shape({
   password: Yup.string()
     .required('Password is required')
 });
-
 const LoginPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
