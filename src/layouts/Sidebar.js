@@ -2,26 +2,85 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { 
-  XMarkIcon, 
+  XMarkIcon,
   HomeIcon, 
   ShoppingCartIcon, 
   ArrowsRightLeftIcon, 
-  UserGroupIcon 
+  UserGroupIcon,
+  DocumentTextIcon,
+  ChartBarIcon,
+  UsersIcon,
+  CogIcon
 } from '@heroicons/react/24/outline';
 
 const Sidebar = ({ open, closeSidebar }) => {
   const location = useLocation();
-  const { hasPermission } = useAuth();
+  const { hasPermission, hasRoleLevel, hasRole, user } = useAuth();
   
+  // Navigation items with required permissions
   const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, requiredRole: 'logistics_officer' },
-    { name: 'Purchases', href: '/purchases', icon: ShoppingCartIcon, requiredRole: 'logistics_officer' },
-    { name: 'Transfers', href: '/transfers', icon: ArrowsRightLeftIcon, requiredRole: 'logistics_officer' },
-    { name: 'Assignments', href: '/assignments', icon: UserGroupIcon, requiredRole: 'base_commander' }
+    { 
+      name: 'Dashboard', 
+      href: '/dashboard', 
+      icon: HomeIcon,
+      access: 'all'  // All authenticated users can access dashboard
+    },
+    { 
+      name: 'Assets', 
+      href: '/assets',  
+      icon: ChartBarIcon,
+      access: 'view_logistics'
+    },
+    { 
+      name: 'Purchases', 
+      href: '/purchases', 
+      icon: ShoppingCartIcon,
+      access: 'request_purchases'
+    },
+    { 
+      name: 'Transfers', 
+      href: '/transfers', 
+      icon: ArrowsRightLeftIcon,
+      access: 'request_transfers'
+    },
+    { 
+      name: 'Assignments', 
+      href: '/assignments', 
+      icon: UserGroupIcon,
+      access: 'manage_base_assignments'
+    },
+    {
+      name: 'Reports',
+      href: '/reports',
+      icon: DocumentTextIcon, 
+      access: 'view_limited_reports'
+    },
+    // Admin-only sections
+    {
+      name: 'User Management',
+      href: '/users',
+      icon: UsersIcon,
+      access: 'manage_users'
+    },
+    {
+      name: 'Settings',
+      href: '/settings',
+      icon: CogIcon,
+      access: 'edit_all'
+    }
   ];
   
   const isActive = (path) => {
     return location.pathname === path;
+  };
+  
+  // Check if user can see a menu item
+  const canSeeMenuItem = (accessRequirement) => {
+    if (accessRequirement === 'all') {
+      return true;
+    }
+    
+    return hasPermission(accessRequirement);
   };
   
   return (
@@ -57,10 +116,31 @@ const Sidebar = ({ open, closeSidebar }) => {
             </button>
           </div>
           
+          {/* User info with role badge */}
+          {user && (
+            <div className="px-4 py-3 bg-primary-700">
+              <p className="text-white text-sm font-medium truncate">{user.firstName} {user.lastName}</p>
+              <div className="flex items-center mt-1">
+                <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                  user.role === 'admin' ? 'bg-red-100 text-red-800' :
+                  user.role === 'base_commander' ? 'bg-blue-100 text-blue-800' :
+                  user.role === 'logistics_officer' ? 'bg-green-100 text-green-800' :
+                  'bg-gray-100 text-gray-800'
+                }`}>
+                  {user.role === 'admin' ? 'Administrator' :
+                   user.role === 'base_commander' ? 'Base Commander' :
+                   user.role === 'logistics_officer' ? 'Logistics Officer' :
+                   'Staff'}
+                </span>
+                {user.base && <span className="ml-2 text-xs text-primary-200">{user.base}</span>}
+              </div>
+            </div>
+          )}
+          
           {/* Navigation */}
           <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
             {navigation.map((item) => (
-              hasPermission(item.requiredRole) && (
+              canSeeMenuItem(item.access) && (
                 <Link
                   key={item.name}
                   to={item.href}
