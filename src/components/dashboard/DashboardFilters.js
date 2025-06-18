@@ -97,7 +97,8 @@ const DashboardFilters = ({ onFilterChange, bases, equipmentTypes }) => {
         </div>
       </div>
     </div>
+
   );
 };
 
-export default DashboardFilters;
+export default DashboardFilters;  //
